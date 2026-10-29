@@ -1,1 +1,614 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Study Assistant</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f4ff;
+  color: #252746;
+}
+
+header {
+  background: linear-gradient(135deg, #5546d9, #9274f5);
+  color: white;
+  text-align: center;
+  padding: 30px 15px;
+}
+
+header h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+}
+
+header p {
+  margin: 0;
+}
+
+.container {
+  max-width: 950px;
+  margin: auto;
+  padding: 16px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  margin: 16px 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px #25274612;
+}
+
+h2 {
+  color: #5546d9;
+  margin-top: 0;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border: 1px solid #d8d8ee;
+  border-radius: 9px;
+  font-size: 16px;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+button {
+  background: #6554e8;
+  color: white;
+  border: none;
+  padding: 11px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin: 5px 3px 5px 0;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #4535c5;
+}
+
+.secondary {
+  background: #e9e6ff;
+  color: #4032a9;
+}
+
+.result {
+  font-weight: bold;
+  margin-top: 12px;
+  color: #4133b4;
+  overflow-wrap: anywhere;
+}
+
+.timer {
+  font-size: 46px;
+  font-weight: bold;
+  text-align: center;
+  padding: 15px;
+}
+
+.center {
+  text-align: center;
+}
+
+ul {
+  padding-left: 22px;
+}
+
+li {
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+
+.done {
+  text-decoration: line-through;
+  color: #888;
+}
+
+#flashcard {
+  background: #eeeaff;
+  padding: 25px 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 20px;
+  min-height: 90px;
+  margin: 12px 0;
+}
+
+footer {
+  text-align: center;
+  background: #252746;
+  color: white;
+  padding: 22px;
+  margin-top: 25px;
+}
+
+small {
+  color: #777;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>📚 Smart Study Assistant</h1>
+  <p>Your little helper for smarter studying ✨</p>
+</header>
+
+<main class="container">
+
+  <!-- Percentage Calculator -->
+  <section class="card">
+    <h2>🧮 Percentage Calculator</h2>
+    <label for="obtained">Obtained Marks</label>
+    <input id="obtained" type="number" min="0"
+      placeholder="e.g. 450">
+
+    <label for="total">Total Marks</label>
+    <input id="total" type="number" min="1"
+      placeholder="e.g. 500">
+
+    <button onclick="calculatePercentage()">Calculate</button>
+    <div id="percentageResult" class="result"
+      aria-live="polite"></div>
+  </section>
+
+  <!-- Study Timer -->
+  <section class="card">
+    <h2>⏳ Study Timer</h2>
+    <p>Focus for 25 minutes, then take a short break.</p>
+
+    <div id="timer" class="timer">25:00</div>
+
+    <div class="center">
+      <button onclick="startTimer()">▶ Start</button>
+      <button class="secondary" onclick="pauseTimer()">⏸ Pause</button>
+      <button class="secondary" onclick="resetTimer()">↻ Reset</button>
+    </div>
+    <div id="timerMessage" class="result center"
+      aria-live="polite"></div>
+  </section>
+
+  <!-- To-do List -->
+  <section class="card">
+    <h2>✅ My To-Do List</h2>
+    <input id="taskInput" placeholder="Write a study task..."
+      maxlength="200">
+
+    <button onclick="addTask()">+ Add Task</button>
+    <ul id="taskList"></ul>
+  </section>
+
+  <!-- Notes -->
+  <section class="card">
+    <h2>📝 My Study Notes</h2>
+    <input id="noteTitle" placeholder="Note title"
+      maxlength="100">
+
+    <textarea id="noteText"
+      placeholder="Write your notes here..."></textarea>
+
+    <button onclick="saveNote()">💾 Save Note</button>
+    <button class="secondary" onclick="downloadNotes()">
+      ⬇ Download Notes
+    </button>
+
+    <div id="noteMessage" class="result"
+      aria-live="polite"></div>
+
+    <h3>Saved Notes</h3>
+    <ul id="notesList"></ul>
+  </section>
+
+  <!-- Mini Quiz -->
+  <section class="card">
+    <h2>🧠 Mini Quiz</h2>
+    <p id="quizQuestion"></p>
+    <div id="quizOptions"></div>
+    <div id="quizResult" class="result"
+      aria-live="polite"></div>
+
+    <button onclick="nextQuestion()">Next Question →</button>
+  </section>
+
+  <!-- Flashcards -->
+  <section class="card">
+    <h2>📖 Flashcards</h2>
+    <p>Tap the button to reveal the answer.</p>
+
+    <div id="flashcard">What does HTML stand for?</div>
+
+    <div class="center">
+      <button onclick="flipCard()">Show Answer</button>
+      <button class="secondary" onclick="nextCard()">
+        Next Card →
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Made with 💜 for better learning</p>
+  <b>Created by Hijab Fatima</b>
+</footer>
+
+<script>
+/* Percentage Calculator */
+function calculatePercentage() {
+  const obtained = Number(document.getElementById("obtained").value);
+  const total = Number(document.getElementById("total").value);
+  const result = document.getElementById("percentageResult");
+
+  if (
+    document.getElementById("obtained").value.trim() === "" ||
+    document.getElementById("total").value.trim() === "" ||
+    !Number.isFinite(obtained) ||
+    !Number.isFinite(total) ||
+    obtained < 0 ||
+    total <= 0 ||
+    obtained > total
+  ) {
+    result.textContent = "Please enter valid marks.";
+    return;
+  }
+
+  const percentage = (obtained / total) * 100;
+  let message = "Keep learning!";
+
+  if (percentage >= 80) message = "Excellent! 🌟";
+  else if (percentage >= 60) message = "Great work! 👏";
+  else if (percentage >= 40) message = "Good effort! 💪";
+
+  result.textContent =
+    "Your percentage: " + percentage.toFixed(2) + "% — " + message;
+}
+
+/* Study Timer */
+let timeLeft = 25 * 60;
+let timerInterval = null;
+
+function showTimer() {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  document.getElementById("timer").textContent =
+    String(minutes).padStart(2, "0") + ":" +
+    String(seconds).padStart(2, "0");
+}
+
+function startTimer() {
+  if (timerInterval !== null) return;
+
+  document.getElementById("timerMessage").textContent = "Stay focused! 📚";
+
+  timerInterval = setInterval(function() {
+    timeLeft--;
+    showTimer();
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById("timerMessage").textContent =
+        "Session complete! Take a short break. 🎉";
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  document.getElementById("timerMessage").textContent = "Timer paused.";
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timeLeft = 25 * 60;
+  showTimer();
+  document.getElementById("timerMessage").textContent = "";
+}
+
+/* To-do List */
+let tasks = [];
+
+try {
+  tasks = JSON.parse(localStorage.getItem("studyTasks")) || [];
+  if (!Array.isArray(tasks)) tasks = [];
+} catch (error) {
+  tasks = [];
+}
+
+function saveTasks() {
+  try {
+    localStorage.setItem("studyTasks", JSON.stringify(tasks));
+  } catch (error) {
+    alert("Could not save tasks on this device.");
+  }
+}
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  list.replaceChildren();
+
+  tasks.forEach(function(task, index) {
+    const li = document.createElement("li");
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+
+    checkbox.type = "checkbox";
+    checkbox.checked = task.done;
+    checkbox.style.width = "auto";
+    checkbox.style.marginRight = "8px";
+
+    checkbox.addEventListener("change", function() {
+      tasks[index].done = checkbox.checked;
+      saveTasks();
+      renderTasks();
+    });
+
+    const text = document.createElement("span");
+    text.textContent = task.text;
+    if (task.done) text.className = "done";
+
+    label.append(checkbox, text);
+
+    const remove = document.createElement("button");
+    remove.textContent = "Delete";
+    remove.className = "secondary";
+    remove.onclick = function() {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    };
+
+    li.append(label, remove);
+    list.appendChild(li);
+  });
+}
+
+function addTask() {
+  const input = document.getElementById("taskInput");
+  const text = input.value.trim();
+
+  if (!text) {
+    alert("Please write a task first.");
+    return;
+  }
+
+  tasks.push({ text: text, done: false });
+  saveTasks();
+  renderTasks();
+  input.value = "";
+}
+
+renderTasks();
+
+/* Study Notes */
+let notes = [];
+
+try {
+  notes = JSON.parse(localStorage.getItem("studyNotes")) || [];
+  if (!Array.isArray(notes)) notes = [];
+} catch (error) {
+  notes = [];
+}
+
+function saveNotesToStorage() {
+  try {
+    localStorage.setItem("studyNotes", JSON.stringify(notes));
+    return true;
+  } catch (error) {
+    alert("Could not save notes on this device.");
+    return false;
+  }
+}
+
+function renderNotes() {
+  const list = document.getElementById("notesList");
+  list.replaceChildren();
+
+  notes.forEach(function(note, index) {
+    const li = document.createElement("li");
+    const title = document.createElement("strong");
+    title.textContent = note.title || "Untitled Note";
+
+    const preview = document.createElement("p");
+    preview.textContent = note.text;
+
+    const remove = document.createElement("button");
+    remove.textContent = "Delete";
+    remove.className = "secondary";
+    remove.onclick = function() {
+      notes.splice(index, 1);
+      saveNotesToStorage();
+      renderNotes();
+    };
+
+    li.append(title, preview, remove);
+    list.appendChild(li);
+  });
+}
+
+function saveNote() {
+  const title = document.getElementById("noteTitle").value.trim();
+  const text = document.getElementById("noteText").value.trim();
+
+  if (!text) {
+    document.getElementById("noteMessage").textContent =
+      "Please write a note first.";
+    return;
+  }
+
+  notes.push({
+    title: title || "Untitled Note",
+    text: text
+  });
+
+  if (saveNotesToStorage()) {
+    renderNotes();
+    document.getElementById("noteTitle").value = "";
+    document.getElementById("noteText").value = "";
+    document.getElementById("noteMessage").textContent = "Note saved! 💜";
+  }
+}
+
+function downloadNotes() {
+  if (notes.length === 0) {
+    alert("Please save a note first.");
+    return;
+  }
+
+  const content = notes.map(function(note) {
+    return (note.title || "Untitled Note") + "\n" + note.text;
+  }).join("\n\n--------------------\n\n");
+
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "study-notes.txt";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+renderNotes();
+
+/* Mini Quiz */
+const questions = [
+  {
+    question: "1. What does HTML stand for?",
+    options: [
+      "HyperText Markup Language",
+      "HighText Machine Language",
+      "HyperTool Multi Language"
+    ],
+    answer: 0
+  },
+  {
+    question: "2. Which part of a computer performs calculations?",
+    options: ["Monitor", "CPU", "Keyboard"],
+    answer: 1
+  },
+  {
+    question: "3. What is 25% of 200?",
+    options: ["25", "50", "75"],
+    answer: 1
+  },
+  {
+    question: "4. Which one is an input device?",
+    options: ["Monitor", "Speaker", "Keyboard"],
+    answer: 2
+  },
+  {
+    question: "5. Which language styles a web page?",
+    options: ["CSS", "SQL", "Python only"],
+    answer: 0
+  }
+];
+
+let questionIndex = 0;
+let quizAnswered = false;
+let quizScore = 0;
+
+function renderQuestion() {
+  const q = questions[questionIndex];
+  document.getElementById("quizQuestion").textContent = q.question;
+  document.getElementById("quizResult").textContent = "";
+  document.getElementById("quizOptions").replaceChildren();
+  quizAnswered = false;
+
+  q.options.forEach(function(option, index) {
+    const button = document.createElement("button");
+    button.textContent = option;
+    button.className = "secondary";
+    button.onclick = function() {
+      checkAnswer(index);
+    };
+    document.getElementById("quizOptions").appendChild(button);
+  });
+}
+
+function checkAnswer(selected) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  if (selected === questions[questionIndex].answer) {
+    quizScore++;
+    document.getElementById("quizResult").textContent =
+      "Correct! 🎉 Score: " + quizScore + "/" + questions.length;
+  } else {
+    document.getElementById("quizResult").textContent =
+      "Not quite! Keep learning. Score: " +
+      quizScore + "/" + questions.length;
+  }
+}
+
+function nextQuestion() {
+  questionIndex++;
+
+  if (questionIndex >= questions.length) {
+    alert("Quiz complete! Your score: " + quizScore + "/" + questions.length);
+    questionIndex = 0;
+    quizScore = 0;
+  }
+
+  renderQuestion();
+}
+
+renderQuestion();
+
+/* Flashcards */
+const flashcards = [
+  { question: "What does HTML stand for?", answer: "HyperText Markup Language" },
+  { question: "What does CPU stand for?", answer: "Central Processing Unit" },
+  { question: "What is 5 × 6?", answer: "30" },
+  { question: "Which planet is known as the Red Planet?", answer: "Mars" },
+  { question: "What does CSS do?", answer: "It styles the appearance of web pages." }
+];
+
+let flashcardIndex = 0;
+let showingAnswer = false;
+
+function renderFlashcard() {
+  showingAnswer = false;
+  document.getElementById("flashcard").textContent =
+    flashcards[flashcardIndex].question;
+}
+
+function flipCard() {
+  showingAnswer = !showingAnswer;
+
+  document.getElementById("flashcard").textContent = showingAnswer
+    ? flashcards[flashcardIndex].answer
+    : flashcards[flashcardIndex].question;
+}
+
+function nextCard() {
+  flashcardIndex = (flashcardIndex + 1) % flashcards.length;
+  renderFlashcard();
+}
+
+renderFlashcard();
+</script>
+
+</body>
+  </html>
+  
